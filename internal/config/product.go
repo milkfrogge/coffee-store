@@ -78,3 +78,8 @@ func (p *ProductConfig) GetPostgresDsn() string {
 	//"postgres://product:product@localhost:5432/product"
 	return fmt.Sprintf("postgresql://%s:%s@%s/%s", p.dbUsername, p.dbPassword, net.JoinHostPort(p.dbHost, p.dbPort), p.dbName)
 }
+
+func (p *ProductConfig) Address() string {
+	//"postgres://product:product@localhost:5432/product"
+	return net.JoinHostPort(p.host, p.port)
+}

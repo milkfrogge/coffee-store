@@ -5,7 +5,7 @@ package product_v1;
 option go_package = "github.com/milkfrogge/coffee-store/pkg/product_v1;product_v1";
 
 message Category {
-  string uuid = 1;
+  string id = 1;
   string name = 2;
 }
 
