@@ -21,5 +21,5 @@ func WithAttempts(f Fn, count int, log *slog.Logger) (any, error) {
 		return a, err
 	}
 
-	return nil, errors.New(fmt.Sprintf("after %d attempts not success"))
+	return nil, errors.New(fmt.Sprintf("after %d attempts not success", count))
 }
