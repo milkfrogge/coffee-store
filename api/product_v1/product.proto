@@ -31,7 +31,7 @@ message ProductInfo {
 }
 
 message Product {
-  string uuid = 1;
+  string id = 1;
   ProductInfo info = 2;
   google.protobuf.Timestamp created_at = 4;
   google.protobuf.Timestamp updated_at = 5;
@@ -42,11 +42,11 @@ message CreateProductRequest {
 }
 
 message CreateProductResponse {
-  string uuid = 1;
+  string id = 1;
 }
 
 message GetSingleProductRequest {
-  string uuid = 1;
+  string id = 1;
 }
 
 message GetSingleProductResponse {
@@ -60,5 +60,5 @@ message GetAllProductsResponse {
 }
 
 message GetAllProductsByCategoryRequest {
-  string uuid = 1;
+  string id = 1;
 }
