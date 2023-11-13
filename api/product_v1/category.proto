@@ -1,0 +1,24 @@
+syntax = "proto3";
+
+package product_v1;
+
+option go_package = "github.com/milkfrogge/coffee-store/pkg/product_v1;product_v1";
+
+message Category {
+  string uuid = 1;
+  string name = 2;
+}
+
+message CreateCategoryRequest {
+  string name = 1;
+}
+
+message CreateCategoryResponse {
+  string uuid = 1;
+}
+
+message GetAllCategoriesRequest {}
+
+message GetAllCategoriesResponse {
+  repeated Category category = 1;
+}
