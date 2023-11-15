@@ -11,6 +11,7 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	emptypb "google.golang.org/protobuf/types/known/emptypb"
 )
 
 // This is a compile-time assertion to ensure that this generated file
@@ -25,9 +26,14 @@ type ProductV1Client interface {
 	CreateProduct(ctx context.Context, in *CreateProductRequest, opts ...grpc.CallOption) (*CreateProductResponse, error)
 	CreateCategory(ctx context.Context, in *CreateCategoryRequest, opts ...grpc.CallOption) (*CreateCategoryResponse, error)
 	GetSingleProduct(ctx context.Context, in *GetSingleProductRequest, opts ...grpc.CallOption) (*GetSingleProductResponse, error)
-	GetAllProducts(ctx context.Context, in *GetAllProductsRequest, opts ...grpc.CallOption) (*GetAllProductsResponse, error)
+	GetAllProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllProductsResponse, error)
 	GetAllProductsByCategory(ctx context.Context, in *GetAllProductsByCategoryRequest, opts ...grpc.CallOption) (*GetAllProductsResponse, error)
-	GetAllCategories(ctx context.Context, in *GetAllCategoriesRequest, opts ...grpc.CallOption) (*GetAllCategoriesResponse, error)
+	GetAllCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCategoriesResponse, error)
+	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	AddCountToProduct(ctx context.Context, in *AddCountToProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteProduct(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 }
 
 type productV1Client struct {
@@ -65,7 +71,7 @@ func (c *productV1Client) GetSingleProduct(ctx context.Context, in *GetSinglePro
 	return out, nil
 }
 
-func (c *productV1Client) GetAllProducts(ctx context.Context, in *GetAllProductsRequest, opts ...grpc.CallOption) (*GetAllProductsResponse, error) {
+func (c *productV1Client) GetAllProducts(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllProductsResponse, error) {
 	out := new(GetAllProductsResponse)
 	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/GetAllProducts", in, out, opts...)
 	if err != nil {
@@ -83,9 +89,54 @@ func (c *productV1Client) GetAllProductsByCategory(ctx context.Context, in *GetA
 	return out, nil
 }
 
-func (c *productV1Client) GetAllCategories(ctx context.Context, in *GetAllCategoriesRequest, opts ...grpc.CallOption) (*GetAllCategoriesResponse, error) {
+func (c *productV1Client) GetAllCategories(ctx context.Context, in *emptypb.Empty, opts ...grpc.CallOption) (*GetAllCategoriesResponse, error) {
 	out := new(GetAllCategoriesResponse)
 	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/GetAllCategories", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productV1Client) UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/UpdateProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productV1Client) AddCountToProduct(ctx context.Context, in *AddCountToProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/AddCountToProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productV1Client) UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/UpdateCategory", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productV1Client) DeleteProduct(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/DeleteProduct", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *productV1Client) DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/DeleteCategory", in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -99,9 +150,14 @@ type ProductV1Server interface {
 	CreateProduct(context.Context, *CreateProductRequest) (*CreateProductResponse, error)
 	CreateCategory(context.Context, *CreateCategoryRequest) (*CreateCategoryResponse, error)
 	GetSingleProduct(context.Context, *GetSingleProductRequest) (*GetSingleProductResponse, error)
-	GetAllProducts(context.Context, *GetAllProductsRequest) (*GetAllProductsResponse, error)
+	GetAllProducts(context.Context, *emptypb.Empty) (*GetAllProductsResponse, error)
 	GetAllProductsByCategory(context.Context, *GetAllProductsByCategoryRequest) (*GetAllProductsResponse, error)
-	GetAllCategories(context.Context, *GetAllCategoriesRequest) (*GetAllCategoriesResponse, error)
+	GetAllCategories(context.Context, *emptypb.Empty) (*GetAllCategoriesResponse, error)
+	UpdateProduct(context.Context, *UpdateProductRequest) (*emptypb.Empty, error)
+	AddCountToProduct(context.Context, *AddCountToProductRequest) (*emptypb.Empty, error)
+	UpdateCategory(context.Context, *UpdateCategoryRequest) (*emptypb.Empty, error)
+	DeleteProduct(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
+	DeleteCategory(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
 	mustEmbedUnimplementedProductV1Server()
 }
 
@@ -118,14 +174,29 @@ func (UnimplementedProductV1Server) CreateCategory(context.Context, *CreateCateg
 func (UnimplementedProductV1Server) GetSingleProduct(context.Context, *GetSingleProductRequest) (*GetSingleProductResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetSingleProduct not implemented")
 }
-func (UnimplementedProductV1Server) GetAllProducts(context.Context, *GetAllProductsRequest) (*GetAllProductsResponse, error) {
+func (UnimplementedProductV1Server) GetAllProducts(context.Context, *emptypb.Empty) (*GetAllProductsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllProducts not implemented")
 }
 func (UnimplementedProductV1Server) GetAllProductsByCategory(context.Context, *GetAllProductsByCategoryRequest) (*GetAllProductsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllProductsByCategory not implemented")
 }
-func (UnimplementedProductV1Server) GetAllCategories(context.Context, *GetAllCategoriesRequest) (*GetAllCategoriesResponse, error) {
+func (UnimplementedProductV1Server) GetAllCategories(context.Context, *emptypb.Empty) (*GetAllCategoriesResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetAllCategories not implemented")
+}
+func (UnimplementedProductV1Server) UpdateProduct(context.Context, *UpdateProductRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateProduct not implemented")
+}
+func (UnimplementedProductV1Server) AddCountToProduct(context.Context, *AddCountToProductRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddCountToProduct not implemented")
+}
+func (UnimplementedProductV1Server) UpdateCategory(context.Context, *UpdateCategoryRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method UpdateCategory not implemented")
+}
+func (UnimplementedProductV1Server) DeleteProduct(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteProduct not implemented")
+}
+func (UnimplementedProductV1Server) DeleteCategory(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeleteCategory not implemented")
 }
 func (UnimplementedProductV1Server) mustEmbedUnimplementedProductV1Server() {}
 
@@ -195,7 +266,7 @@ func _ProductV1_GetSingleProduct_Handler(srv interface{}, ctx context.Context, d
 }
 
 func _ProductV1_GetAllProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllProductsRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -207,7 +278,7 @@ func _ProductV1_GetAllProducts_Handler(srv interface{}, ctx context.Context, dec
 		FullMethod: "/product_v1.ProductV1/GetAllProducts",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductV1Server).GetAllProducts(ctx, req.(*GetAllProductsRequest))
+		return srv.(ProductV1Server).GetAllProducts(ctx, req.(*emptypb.Empty))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -231,7 +302,7 @@ func _ProductV1_GetAllProductsByCategory_Handler(srv interface{}, ctx context.Co
 }
 
 func _ProductV1_GetAllCategories_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetAllCategoriesRequest)
+	in := new(emptypb.Empty)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -243,7 +314,97 @@ func _ProductV1_GetAllCategories_Handler(srv interface{}, ctx context.Context, d
 		FullMethod: "/product_v1.ProductV1/GetAllCategories",
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ProductV1Server).GetAllCategories(ctx, req.(*GetAllCategoriesRequest))
+		return srv.(ProductV1Server).GetAllCategories(ctx, req.(*emptypb.Empty))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductV1_UpdateProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).UpdateProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/UpdateProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).UpdateProduct(ctx, req.(*UpdateProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductV1_AddCountToProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddCountToProductRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).AddCountToProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/AddCountToProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).AddCountToProduct(ctx, req.(*AddCountToProductRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductV1_UpdateCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpdateCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).UpdateCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/UpdateCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).UpdateCategory(ctx, req.(*UpdateCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductV1_DeleteProduct_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).DeleteProduct(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/DeleteProduct",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).DeleteProduct(ctx, req.(*DeleteCategoryRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _ProductV1_DeleteCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeleteCategoryRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).DeleteCategory(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/DeleteCategory",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).DeleteCategory(ctx, req.(*DeleteCategoryRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -278,6 +439,26 @@ var ProductV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetAllCategories",
 			Handler:    _ProductV1_GetAllCategories_Handler,
+		},
+		{
+			MethodName: "UpdateProduct",
+			Handler:    _ProductV1_UpdateProduct_Handler,
+		},
+		{
+			MethodName: "AddCountToProduct",
+			Handler:    _ProductV1_AddCountToProduct_Handler,
+		},
+		{
+			MethodName: "UpdateCategory",
+			Handler:    _ProductV1_UpdateCategory_Handler,
+		},
+		{
+			MethodName: "DeleteProduct",
+			Handler:    _ProductV1_DeleteProduct_Handler,
+		},
+		{
+			MethodName: "DeleteCategory",
+			Handler:    _ProductV1_DeleteCategory_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

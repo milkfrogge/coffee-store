@@ -6,8 +6,8 @@ type Product struct {
 	Id          string
 	Name        string
 	Description string
-	Price       int64
-	Count       int64
+	Price       uint64
+	Count       uint64
 	Category    Category
 	Pics        []string
 	CreatedAt   time.Time

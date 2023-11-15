@@ -14,11 +14,17 @@ message CreateCategoryRequest {
 }
 
 message CreateCategoryResponse {
-  string uuid = 1;
+  string id = 1;
 }
-
-message GetAllCategoriesRequest {}
 
 message GetAllCategoriesResponse {
   repeated Category category = 1;
+}
+
+message UpdateCategoryRequest {
+  Category category = 1;
+}
+
+message DeleteCategoryRequest {
+  string id = 1;
 }

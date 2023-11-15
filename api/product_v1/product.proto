@@ -3,7 +3,9 @@ syntax = "proto3";
 package product_v1;
 
 import "google/protobuf/timestamp.proto";
+import "google/protobuf/empty.proto";
 import "category.proto";
+//import "api/product_v1/category.proto";
 
 option go_package = "github.com/milkfrogge/coffee-store/pkg/product_v1;product_v1";
 
@@ -14,18 +16,23 @@ service ProductV1 {
   rpc CreateCategory(CreateCategoryRequest) returns (CreateCategoryResponse);
 
   rpc GetSingleProduct(GetSingleProductRequest) returns (GetSingleProductResponse);
-  rpc GetAllProducts(GetAllProductsRequest) returns (GetAllProductsResponse);
+  rpc GetAllProducts(google.protobuf.Empty) returns (GetAllProductsResponse);
   rpc GetAllProductsByCategory(GetAllProductsByCategoryRequest) returns (GetAllProductsResponse);
-  rpc GetAllCategories(GetAllCategoriesRequest) returns (GetAllCategoriesResponse);
+  rpc GetAllCategories(google.protobuf.Empty) returns (GetAllCategoriesResponse);
 
-  // TODO: add update and delete for categories and products
+  rpc UpdateProduct(UpdateProductRequest) returns (google.protobuf.Empty);
+  rpc AddCountToProduct(AddCountToProductRequest) returns (google.protobuf.Empty);
+  rpc UpdateCategory(UpdateCategoryRequest) returns (google.protobuf.Empty);
+
+  rpc DeleteProduct(DeleteCategoryRequest) returns (google.protobuf.Empty);
+  rpc DeleteCategory(DeleteCategoryRequest) returns (google.protobuf.Empty);
 }
 
 message ProductInfo {
   string name = 1;
   string description = 2;
-  int64 price = 3;
-  int64 count = 4;
+  uint64 price = 3;
+  uint64 count = 4;
   Category category = 5;
   repeated string pics = 6;
 }
@@ -53,12 +60,23 @@ message GetSingleProductResponse {
   Product product = 1;
 }
 
-message GetAllProductsRequest {}
-
 message GetAllProductsResponse {
   repeated Product product = 1;
 }
 
 message GetAllProductsByCategoryRequest {
+  string id = 1;
+}
+
+message UpdateProductRequest {
+  Product product = 1;
+}
+
+message AddCountToProductRequest {
+  string id = 1;
+  uint64 count = 2;
+}
+
+message DeleteProductRequest {
   string id = 1;
 }
