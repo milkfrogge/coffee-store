@@ -15,6 +15,8 @@ const (
 	defaultDbUsernameEnvName = "PRODUCT_DB_USERNAME"
 	defaultDbPasswordEnvName = "PRODUCT_DB_PASSWORD"
 	defaultDbNameEnvName     = "PRODUCT_DB_NAME"
+	defaultJaegerHostEnvName = "JAEGER_HOST"
+	defaultJaegerPortEnvName = "JAEGER_PORT"
 )
 
 type ProductConfig struct {
@@ -22,6 +24,8 @@ type ProductConfig struct {
 	port       string
 	dbHost     string
 	dbPort     string
+	JaegerHost string
+	JaegerPort string
 	dbUsername string
 	dbPassword string
 	dbName     string
@@ -63,6 +67,16 @@ func NewProductConfig() (*ProductConfig, error) {
 		return nil, errors.New("dbPass not found")
 	}
 
+	jaegerHost := os.Getenv(defaultJaegerHostEnvName)
+	if len(jaegerHost) == 0 {
+		return nil, errors.New("jaegerHost not found")
+	}
+
+	jaegerPort := os.Getenv(defaultJaegerPortEnvName)
+	if len(jaegerPort) == 0 {
+		return nil, errors.New("jaegerPort not found")
+	}
+
 	return &ProductConfig{
 		host:       host,
 		port:       port,
@@ -71,6 +85,8 @@ func NewProductConfig() (*ProductConfig, error) {
 		dbUsername: dbName,
 		dbPassword: dbPass,
 		dbName:     dbName,
+		JaegerHost: jaegerHost,
+		JaegerPort: jaegerPort,
 	}, nil
 }
 

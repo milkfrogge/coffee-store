@@ -1,11 +1,14 @@
 package main
 
 import (
+	"fmt"
 	productApi "github.com/milkfrogge/coffee-store/internal/api/product"
 	"github.com/milkfrogge/coffee-store/internal/config"
 	productRepo "github.com/milkfrogge/coffee-store/internal/repository/product"
 	productService "github.com/milkfrogge/coffee-store/internal/service/product"
+	"github.com/milkfrogge/coffee-store/pkg/jaeger"
 	desc "github.com/milkfrogge/coffee-store/pkg/product_v1"
+	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/reflection"
@@ -32,6 +35,15 @@ func main() {
 		logger.Error(err.Error())
 		return
 	}
+
+	logger.Info("Init tracer")
+	tracer := jaeger.NewTracer(fmt.Sprintf("http://%s:%s/api/traces", cfg.JaegerHost, cfg.JaegerPort))
+	provider, err := tracer.NewTracerProvider("ProductService")
+	if err != nil {
+		logger.Error(err.Error())
+		return
+	}
+	otel.SetTracerProvider(provider)
 
 	logger.Info("Init repo")
 	repository, err := productRepo.NewProductPostgresRepository(cfg.GetPostgresDsn(), logger)

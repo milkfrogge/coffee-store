@@ -8,18 +8,24 @@ import (
 	"github.com/jackc/pgx/v5"
 	"github.com/milkfrogge/coffee-store/internal/model"
 	"github.com/milkfrogge/coffee-store/internal/utils"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/trace"
 	"log/slog"
 	"time"
 )
 
 type PostgresRepository struct {
-	conn *pgx.Conn
-	log  *slog.Logger
+	conn   *pgx.Conn
+	log    *slog.Logger
+	tracer trace.TracerProvider
 }
 
 func (r *PostgresRepository) CreateCategory(ctx context.Context, category model.CreateCategoryDTO) (string, error) {
 	const op = "Product.Repo.Postgres.CreateCategory"
 	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
 
 	var id pgxuuid.UUID
 
@@ -36,6 +42,9 @@ func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.Cr
 	const op = "Product.Repo.Postgres.CreateProduct"
 	r.log.Debug(op)
 	var id pgxuuid.UUID
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
 
 	temp, _ := uuid.FromString(product.CategoryId)
 	categoryId := pgxuuid.UUID(temp)
@@ -87,6 +96,9 @@ func (r *PostgresRepository) FindAllCategories(ctx context.Context) ([]model.Cat
 	const op = "Product.Repo.Postgres.FindAllCategories"
 	r.log.Debug(op)
 
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
 	var id pgxuuid.UUID
 	var category model.Category
 	out := make([]model.Category, 0)
@@ -114,6 +126,9 @@ func (r *PostgresRepository) FindAllCategories(ctx context.Context) ([]model.Cat
 func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindAllProducts"
 	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
 
 	var id pgxuuid.UUID
 	var categoryId pgxuuid.UUID
@@ -162,6 +177,9 @@ func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Produ
 func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categoryIdS string) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindProductsByCategory"
 	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
 
 	var id pgxuuid.UUID
 	var categoryId pgxuuid.UUID
@@ -213,6 +231,9 @@ func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categor
 func (r *PostgresRepository) FindOneProduct(ctx context.Context, idS string) (model.Product, error) {
 	const op = "Product.Repo.Postgres.FindOneProduct"
 	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
 
 	var id pgxuuid.UUID
 	var categoryId pgxuuid.UUID
@@ -280,9 +301,17 @@ func NewProductPostgresRepository(dsn string, log *slog.Logger) (*PostgresReposi
 			return nil, err
 		}
 
+		tracerProvider := otel.GetTracerProvider()
+
+		if err != nil {
+			log.Error(fmt.Sprintf("Can`t init tracer: %s", err.Error()))
+			return nil, err
+		}
+
 		return &PostgresRepository{
-			conn: conn,
-			log:  log,
+			conn:   conn,
+			log:    log,
+			tracer: tracerProvider,
 		}, nil
 	}, 5, log)
 
