@@ -41,11 +41,15 @@ message Product {
   string id = 1;
   ProductInfo info = 2;
   google.protobuf.Timestamp created_at = 4;
-  google.protobuf.Timestamp updated_at = 5;
 }
 
 message CreateProductRequest {
-  ProductInfo info = 1;
+  string name = 1;
+  string description = 2;
+  uint64 price = 3;
+  uint64 count = 4;
+  string categoryId = 5;
+  repeated string pics = 6;
 }
 
 message CreateProductResponse {

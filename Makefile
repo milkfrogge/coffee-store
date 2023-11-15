@@ -19,3 +19,11 @@ generate-product-api:
 
 migrate-product:
 	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product up
+
+test:
+	go test -count=100 ./...
+
+cover:
+	go test -short -count=1 -coverprofile=coverage.out ./...
+	go tool cover -html=coverage.out
+	rm coverage.out
