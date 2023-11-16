@@ -7,11 +7,17 @@ import (
 )
 
 func (i *Implementation) DeleteProduct(ctx context.Context, request *desc.DeleteCategoryRequest) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+	const op = "Implementation.DeleteCategory"
+	i.log.Debug(op)
+
+	return &emptypb.Empty{}, i.ProductService.DeleteProduct(ctx, request.Id)
+
 }
 
 func (i *Implementation) DeleteCategory(ctx context.Context, request *desc.DeleteCategoryRequest) (*emptypb.Empty, error) {
-	//TODO implement me
-	panic("implement me")
+	const op = "Implementation.DeleteCategory"
+	i.log.Debug(op)
+
+	return &emptypb.Empty{}, i.ProductService.DeleteCategory(ctx, request.Id)
+
 }

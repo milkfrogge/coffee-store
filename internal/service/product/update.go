@@ -10,7 +10,17 @@ func (s *Service) UpdateProduct(ctx context.Context, product model.Product) erro
 	panic("implement me")
 }
 
-func (s *Service) AddCountToProduct(ctx context.Context, dto model.AddCountToProductDTO) error {
+func (s *Service) AddCountToProduct(ctx context.Context, dto model.CountToProductDTO) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Service) SubtractCountToProduct(ctx context.Context, dto model.CountToProductDTO) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (s *Service) SubtractCountToProducts(ctx context.Context, dto []model.CountToProductDTO) error {
 	//TODO implement me
 	panic("implement me")
 }

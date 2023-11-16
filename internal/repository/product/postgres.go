@@ -20,6 +20,16 @@ type PostgresRepository struct {
 	tracer trace.TracerProvider
 }
 
+func (r *PostgresRepository) UpdateCountOfProduct(ctx context.Context, product model.Product) error {
+	//TODO implement me
+	panic("implement me")
+}
+
+func (r *PostgresRepository) UpdateManyCountsOfProduct(ctx context.Context, products []model.Product) error {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (r *PostgresRepository) CreateCategory(ctx context.Context, category model.CreateCategoryDTO) (string, error) {
 	const op = "Product.Repo.Postgres.CreateCategory"
 	r.log.Debug(op)
@@ -280,14 +290,43 @@ func (r *PostgresRepository) UpdateProduct(ctx context.Context, product model.Pr
 	panic("implement me")
 }
 
-func (r *PostgresRepository) DeleteCategory(ctx context.Context, categoryId string) error {
-	//TODO implement me
-	panic("implement me")
+func (r *PostgresRepository) DeleteCategory(ctx context.Context, categoryIdS string) error {
+	const op = "Product.Repo.Postgres.DeleteCategory"
+	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	temp, _ := uuid.FromString(categoryIdS)
+	idUUID := pgxuuid.UUID(temp)
+
+	_, err := r.conn.Exec(ctx, "Delete from category where id=$1", idUUID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
+
 }
 
-func (r *PostgresRepository) DeleteProduct(ctx context.Context, id string) error {
-	//TODO implement me
-	panic("implement me")
+func (r *PostgresRepository) DeleteProduct(ctx context.Context, idS string) error {
+	const op = "Product.Repo.Postgres.DeleteProduct"
+	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	temp, _ := uuid.FromString(idS)
+	idUUID := pgxuuid.UUID(temp)
+
+	_, err := r.conn.Exec(ctx, "Delete from product where id=$1", idUUID)
+
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func NewProductPostgresRepository(dsn string, log *slog.Logger) (*PostgresRepository, error) {

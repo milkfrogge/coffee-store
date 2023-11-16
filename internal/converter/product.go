@@ -15,6 +15,7 @@ func ProductsToProto(products []model.Product) *desc.GetAllProductsResponse {
 }
 
 func ProductToProto(product model.Product) *desc.Product {
+
 	return &desc.Product{
 		Id: product.Id,
 		Info: &desc.ProductInfo{

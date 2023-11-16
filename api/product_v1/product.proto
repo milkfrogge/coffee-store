@@ -23,6 +23,7 @@ service ProductV1 {
   rpc UpdateProduct(UpdateProductRequest) returns (google.protobuf.Empty);
   rpc AddCountToProduct(AddCountToProductRequest) returns (google.protobuf.Empty);
   rpc SubtractCountToProduct(SubtractCountToProductRequest) returns (google.protobuf.Empty);
+  rpc SubtractCountToManyProducts(SubtractCountToManyProductsRequest) returns (google.protobuf.Empty);
   rpc UpdateCategory(UpdateCategoryRequest) returns (google.protobuf.Empty);
 
   rpc DeleteProduct(DeleteCategoryRequest) returns (google.protobuf.Empty);
@@ -81,14 +82,21 @@ message UpdateProductRequest {
   Product product = 1;
 }
 
-message AddCountToProductRequest {
+message UpdateProductCountMessage{
   string id = 1;
   uint64 count = 2;
 }
 
+message AddCountToProductRequest {
+  UpdateProductCountMessage product = 1;
+}
+
 message SubtractCountToProductRequest {
-  string id = 1;
-  uint64 count = 2;
+  UpdateProductCountMessage product = 1;
+}
+
+message SubtractCountToManyProductsRequest {
+  repeated UpdateProductCountMessage products = 1;
 }
 
 message DeleteProductRequest {

@@ -32,6 +32,7 @@ type ProductV1Client interface {
 	UpdateProduct(ctx context.Context, in *UpdateProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	AddCountToProduct(ctx context.Context, in *AddCountToProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	SubtractCountToProduct(ctx context.Context, in *SubtractCountToProductRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
+	SubtractCountToManyProducts(ctx context.Context, in *SubtractCountToManyProductsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteProduct(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
 	DeleteCategory(ctx context.Context, in *DeleteCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error)
@@ -126,6 +127,15 @@ func (c *productV1Client) SubtractCountToProduct(ctx context.Context, in *Subtra
 	return out, nil
 }
 
+func (c *productV1Client) SubtractCountToManyProducts(ctx context.Context, in *SubtractCountToManyProductsRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
+	out := new(emptypb.Empty)
+	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/SubtractCountToManyProducts", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 func (c *productV1Client) UpdateCategory(ctx context.Context, in *UpdateCategoryRequest, opts ...grpc.CallOption) (*emptypb.Empty, error) {
 	out := new(emptypb.Empty)
 	err := c.cc.Invoke(ctx, "/product_v1.ProductV1/UpdateCategory", in, out, opts...)
@@ -166,6 +176,7 @@ type ProductV1Server interface {
 	UpdateProduct(context.Context, *UpdateProductRequest) (*emptypb.Empty, error)
 	AddCountToProduct(context.Context, *AddCountToProductRequest) (*emptypb.Empty, error)
 	SubtractCountToProduct(context.Context, *SubtractCountToProductRequest) (*emptypb.Empty, error)
+	SubtractCountToManyProducts(context.Context, *SubtractCountToManyProductsRequest) (*emptypb.Empty, error)
 	UpdateCategory(context.Context, *UpdateCategoryRequest) (*emptypb.Empty, error)
 	DeleteProduct(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
 	DeleteCategory(context.Context, *DeleteCategoryRequest) (*emptypb.Empty, error)
@@ -202,6 +213,9 @@ func (UnimplementedProductV1Server) AddCountToProduct(context.Context, *AddCount
 }
 func (UnimplementedProductV1Server) SubtractCountToProduct(context.Context, *SubtractCountToProductRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SubtractCountToProduct not implemented")
+}
+func (UnimplementedProductV1Server) SubtractCountToManyProducts(context.Context, *SubtractCountToManyProductsRequest) (*emptypb.Empty, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SubtractCountToManyProducts not implemented")
 }
 func (UnimplementedProductV1Server) UpdateCategory(context.Context, *UpdateCategoryRequest) (*emptypb.Empty, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdateCategory not implemented")
@@ -387,6 +401,24 @@ func _ProductV1_SubtractCountToProduct_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ProductV1_SubtractCountToManyProducts_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(SubtractCountToManyProductsRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ProductV1Server).SubtractCountToManyProducts(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/product_v1.ProductV1/SubtractCountToManyProducts",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ProductV1Server).SubtractCountToManyProducts(ctx, req.(*SubtractCountToManyProductsRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 func _ProductV1_UpdateCategory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(UpdateCategoryRequest)
 	if err := dec(in); err != nil {
@@ -483,6 +515,10 @@ var ProductV1_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SubtractCountToProduct",
 			Handler:    _ProductV1_SubtractCountToProduct_Handler,
+		},
+		{
+			MethodName: "SubtractCountToManyProducts",
+			Handler:    _ProductV1_SubtractCountToManyProducts_Handler,
 		},
 		{
 			MethodName: "UpdateCategory",

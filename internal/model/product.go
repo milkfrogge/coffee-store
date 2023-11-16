@@ -20,7 +20,7 @@ type Category struct {
 	Name string
 }
 
-type AddCountToProductDTO struct {
+type CountToProductDTO struct {
 	Id    string
 	Count uint64
 }

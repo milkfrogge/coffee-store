@@ -50,28 +50,6 @@ func (i *Implementation) GetAllProductsByCategory(ctx context.Context, request *
 
 }
 
-func (i *Implementation) GetAllCategories(ctx context.Context, _ *emptypb.Empty) (*desc.GetAllCategoriesResponse, error) {
-	const op = "Implementation.GetAllCategories"
-	i.log.Debug(op)
-
-	ctx, err := jaeger.ExtractMetaFromGRPC(ctx)
-	if err != nil {
-		i.log.Error(err.Error())
-	}
-	ctx, span := i.tracer.Tracer(op).Start(ctx, op)
-	defer span.End()
-
-	categories, err := i.ProductService.GetAllCategories(ctx)
-	if err != nil {
-		i.log.Error(err.Error())
-		return nil, err
-	}
-
-	span.AddEvent("convert to protobuf")
-
-	return converter.CategoriesToProto(categories), nil
-}
-
 func (i *Implementation) GetAllProducts(ctx context.Context, _ *emptypb.Empty) (*desc.GetAllProductsResponse, error) {
 	const op = "Implementation.GetAllProducts"
 	i.log.Debug(op)
@@ -93,4 +71,26 @@ func (i *Implementation) GetAllProducts(ctx context.Context, _ *emptypb.Empty) (
 
 	return converter.ProductsToProto(products), nil
 
+}
+
+func (i *Implementation) GetAllCategories(ctx context.Context, _ *emptypb.Empty) (*desc.GetAllCategoriesResponse, error) {
+	const op = "Implementation.GetAllCategories"
+	i.log.Debug(op)
+
+	ctx, err := jaeger.ExtractMetaFromGRPC(ctx)
+	if err != nil {
+		i.log.Error(err.Error())
+	}
+	ctx, span := i.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	categories, err := i.ProductService.GetAllCategories(ctx)
+	if err != nil {
+		i.log.Error(err.Error())
+		return nil, err
+	}
+
+	span.AddEvent("convert to protobuf")
+
+	return converter.CategoriesToProto(categories), nil
 }
