@@ -27,3 +27,8 @@ cover:
 	go test -short -count=1 -coverprofile=coverage.out ./...
 	go tool cover -html=coverage.out
 	rm coverage.out
+
+migrate:
+	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product force 1
+	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product down
+	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product up

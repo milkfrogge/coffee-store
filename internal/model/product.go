@@ -3,15 +3,17 @@ package model
 import "time"
 
 type Product struct {
-	Id          string
-	Name        string
-	Description string
-	Price       uint64
-	Count       uint64
-	Category    Category
-	Pics        []string
-	CreatedAt   time.Time
-	UpdatedAt   *time.Time
+	Id            string
+	Name          string
+	Description   string
+	Price         uint64
+	Count         uint64
+	BaristaNeeded bool
+	KitchenNeeded bool
+	Category      Category
+	Pics          []string
+	CreatedAt     time.Time
+	UpdatedAt     *time.Time
 }
 
 type Category struct {
@@ -25,12 +27,14 @@ type AddCountToProductDTO struct {
 }
 
 type CreateProductDTO struct {
-	Name        string
-	Description string
-	Price       uint64
-	Count       uint64
-	CategoryId  string
-	Pics        []string
+	Name          string
+	Description   string
+	Price         uint64
+	Count         uint64
+	CategoryId    string
+	BaristaNeeded bool
+	KitchenNeeded bool
+	Pics          []string
 }
 
 type CreateCategoryDTO struct {

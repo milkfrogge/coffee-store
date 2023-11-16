@@ -16,6 +16,11 @@ func (i *Implementation) AddCountToProduct(ctx context.Context, request *desc.Ad
 	panic("implement me")
 }
 
+func (i *Implementation) SubtractCountToProduct(ctx context.Context, request *desc.SubtractCountToProductRequest) (*emptypb.Empty, error) {
+	//TODO implement me
+	panic("implement me")
+}
+
 func (i *Implementation) UpdateCategory(ctx context.Context, request *desc.UpdateCategoryRequest) (*emptypb.Empty, error) {
 	//TODO implement me
 	panic("implement me")

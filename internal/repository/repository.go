@@ -5,6 +5,8 @@ import (
 	"github.com/milkfrogge/coffee-store/internal/model"
 )
 
+//go:generate mockgen -source repository.go -destination mocks/product_repo.go
+
 type ProductRepository interface {
 	CreateCategory(ctx context.Context, category model.CreateCategoryDTO) (string, error)
 	CreateProduct(ctx context.Context, product model.CreateProductDTO) (string, error)

@@ -22,6 +22,7 @@ service ProductV1 {
 
   rpc UpdateProduct(UpdateProductRequest) returns (google.protobuf.Empty);
   rpc AddCountToProduct(AddCountToProductRequest) returns (google.protobuf.Empty);
+  rpc SubtractCountToProduct(SubtractCountToProductRequest) returns (google.protobuf.Empty);
   rpc UpdateCategory(UpdateCategoryRequest) returns (google.protobuf.Empty);
 
   rpc DeleteProduct(DeleteCategoryRequest) returns (google.protobuf.Empty);
@@ -33,8 +34,10 @@ message ProductInfo {
   string description = 2;
   uint64 price = 3;
   uint64 count = 4;
-  Category category = 5;
-  repeated string pics = 6;
+  bool baristaNeeded = 5;
+  bool kitchenNeeded = 6;
+  Category category = 7;
+  repeated string pics = 8;
 }
 
 message Product {
@@ -48,8 +51,10 @@ message CreateProductRequest {
   string description = 2;
   uint64 price = 3;
   uint64 count = 4;
-  string categoryId = 5;
-  repeated string pics = 6;
+  bool baristaNeeded = 5;
+  bool kitchenNeeded = 6;
+  string categoryId = 7;
+  repeated string pics = 8;
 }
 
 message CreateProductResponse {
@@ -77,6 +82,11 @@ message UpdateProductRequest {
 }
 
 message AddCountToProductRequest {
+  string id = 1;
+  uint64 count = 2;
+}
+
+message SubtractCountToProductRequest {
   string id = 1;
   uint64 count = 2;
 }

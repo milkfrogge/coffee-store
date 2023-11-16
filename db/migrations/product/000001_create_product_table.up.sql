@@ -22,6 +22,8 @@ CREATE TABLE IF NOT EXISTS product
     name        VARCHAR(50)  NOT NULL,
     description VARCHAR(500) NOT NULL,
     price       bigint       NOT NULL,
+    barista_needed bool NOT NULL default false,
+    kitchen_needed bool NOT NULL default false,
     counter     bigint       NOT NULL,
     created_at  timestamp    NOT NULL default now(),
     category    uuid         not null references category (id) on DELETE CASCADE

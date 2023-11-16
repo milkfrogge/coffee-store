@@ -18,10 +18,12 @@ func ProductToProto(product model.Product) *desc.Product {
 	return &desc.Product{
 		Id: product.Id,
 		Info: &desc.ProductInfo{
-			Name:        product.Name,
-			Description: product.Description,
-			Price:       product.Price,
-			Count:       product.Count,
+			Name:          product.Name,
+			Description:   product.Description,
+			Price:         product.Price,
+			Count:         product.Count,
+			BaristaNeeded: product.BaristaNeeded,
+			KitchenNeeded: product.KitchenNeeded,
 			Category: &desc.Category{
 				Id:   product.Category.Id,
 				Name: product.Category.Name,
@@ -55,6 +57,8 @@ func CreateProductToDTO(r *desc.CreateProductRequest) model.CreateProductDTO {
 	out.Pics = r.Pics
 	out.Count = r.Count
 	out.Price = r.Price
+	out.BaristaNeeded = r.BaristaNeeded
+	out.KitchenNeeded = r.KitchenNeeded
 	out.CategoryId = r.CategoryId
 	out.Description = r.Description
 	return out

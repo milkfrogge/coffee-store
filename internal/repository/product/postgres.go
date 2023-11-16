@@ -58,12 +58,14 @@ func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.Cr
 	// insert product
 	err = tx.QueryRow(
 		ctx,
-		"INSERT INTO product (name,description,price,category, counter) VALUES ($1,$2,$3,$4,$5) RETURNING id",
+		"INSERT INTO product (name,description,price,category, counter, barista_needed, kitchen_needed) VALUES ($1,$2,$3,$4,$5,$6,$7) RETURNING id",
 		product.Name,
 		product.Description,
 		product.Price,
 		categoryId,
 		product.Count,
+		product.BaristaNeeded,
+		product.KitchenNeeded,
 	).Scan(&id)
 	if err != nil {
 		return "", err
