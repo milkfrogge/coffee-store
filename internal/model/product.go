@@ -13,7 +13,6 @@ type Product struct {
 	Category      Category
 	Pics          []string
 	CreatedAt     time.Time
-	UpdatedAt     *time.Time
 }
 
 type Category struct {

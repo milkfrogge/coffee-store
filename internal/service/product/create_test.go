@@ -2,10 +2,9 @@ package product
 
 import (
 	"context"
-	"errors"
 	"github.com/milkfrogge/coffee-store/internal/model"
-	"github.com/milkfrogge/coffee-store/internal/repository"
 	mock_repository "github.com/milkfrogge/coffee-store/internal/repository/mocks"
+	repo_product "github.com/milkfrogge/coffee-store/internal/repository/product"
 	"github.com/stretchr/testify/require"
 	"go.uber.org/mock/gomock"
 	"log/slog"
@@ -44,11 +43,11 @@ func TestService_CreateCategoryError(t *testing.T) {
 		model.CreateCategoryDTO{Name: "1"},
 		model.CreateCategoryDTO{Name: "norm"}}
 	ret := ""
-	expErrors := []error{ErrTooSmallCategoryName, errors.New("db is down")}
+	expErrors := []error{ErrTooSmallCategoryName, repo_product.ErrDbIsDown}
 
 	uCase := NewService(m, log)
 
-	m.EXPECT().CreateCategory(ctx, in[1]).Return(ret, errors.New("db is down")).Times(1)
+	m.EXPECT().CreateCategory(ctx, in[1]).Return(ret, repo_product.ErrDbIsDown).Times(1)
 
 	for i := 0; i < len(in); i++ {
 
@@ -138,9 +137,9 @@ func TestService_CreateProductError(t *testing.T) {
 	}
 	ret := ""
 
-	expErrors := []error{ErrBaristaAndKitchenNeeded, ErrWrongPrice, ErrWrongCount, repository.ErrNoSuchCategory}
+	expErrors := []error{ErrBaristaAndKitchenNeeded, ErrWrongPrice, ErrWrongCount, repo_product.ErrNoSuchCategory}
 
-	m.EXPECT().CreateProduct(ctx, in[3]).Return(ret, repository.ErrNoSuchCategory).Times(1)
+	m.EXPECT().CreateProduct(ctx, in[3]).Return(ret, repo_product.ErrNoSuchCategory).Times(1)
 
 	uCase := NewService(m, log)
 

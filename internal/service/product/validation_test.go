@@ -8,7 +8,7 @@ import (
 
 func TestValidateCreateProduct(t *testing.T) {
 	table := []model.CreateProductDTO{
-		model.CreateProductDTO{
+		{
 			Name:        "first",
 			Description: "lorem",
 			Price:       1,
@@ -16,7 +16,7 @@ func TestValidateCreateProduct(t *testing.T) {
 			CategoryId:  "0xdeadbeef",
 			Pics:        nil,
 		},
-		model.CreateProductDTO{
+		{
 			Name:        "second",
 			Description: "lorem",
 			Price:       1,
@@ -33,7 +33,7 @@ func TestValidateCreateProduct(t *testing.T) {
 
 func TestValidateCreateProductError(t *testing.T) {
 	table := []model.CreateProductDTO{
-		model.CreateProductDTO{
+		{
 			Name:        "first",
 			Description: "lorem",
 			Price:       1,
@@ -41,7 +41,7 @@ func TestValidateCreateProductError(t *testing.T) {
 			CategoryId:  "0xdeadbeef",
 			Pics:        nil,
 		},
-		model.CreateProductDTO{
+		{
 			Name:        "second",
 			Description: "lorem",
 			Price:       0,
@@ -49,7 +49,7 @@ func TestValidateCreateProductError(t *testing.T) {
 			CategoryId:  "0xdeadbeef",
 			Pics:        []string{"image1"},
 		},
-		model.CreateProductDTO{
+		{
 			Name:          "third",
 			Description:   "lorem",
 			Price:         1,
@@ -72,8 +72,8 @@ func TestValidateCreateProductError(t *testing.T) {
 func TestValidateCreateCategory(t *testing.T) {
 
 	table := []model.CreateCategoryDTO{
-		model.CreateCategoryDTO{Name: "Coffee"},
-		model.CreateCategoryDTO{Name: "Drinks"},
+		{Name: "Coffee"},
+		{Name: "Drinks"},
 	}
 
 	for i := 0; i < len(table); i++ {
@@ -85,7 +85,7 @@ func TestValidateCreateCategory(t *testing.T) {
 func TestValidateCreateCategoryError(t *testing.T) {
 
 	table := []model.CreateCategoryDTO{
-		model.CreateCategoryDTO{Name: "1"},
+		{Name: "1"},
 	}
 
 	expErrors := []error{
