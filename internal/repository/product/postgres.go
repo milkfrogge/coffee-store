@@ -20,6 +20,8 @@ type PostgresRepository struct {
 	tracer trace.TracerProvider
 }
 
+//TODO: add errors and their converters!!
+
 func (r *PostgresRepository) UpdateCountOfProduct(ctx context.Context, product model.Product) error {
 	//TODO implement me
 	panic("implement me")

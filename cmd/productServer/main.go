@@ -6,6 +6,7 @@ import (
 	"github.com/milkfrogge/coffee-store/internal/config"
 	productRepo "github.com/milkfrogge/coffee-store/internal/repository/product"
 	productService "github.com/milkfrogge/coffee-store/internal/service/product"
+	"github.com/milkfrogge/coffee-store/pkg/interceptors"
 	"github.com/milkfrogge/coffee-store/pkg/jaeger"
 	desc "github.com/milkfrogge/coffee-store/pkg/product_v1"
 	"go.opentelemetry.io/otel"
@@ -59,7 +60,7 @@ func main() {
 	sImpl := productApi.NewImplementation(s, logger)
 
 	logger.Info("Register implementation of server")
-	srv := grpc.NewServer(grpc.Creds(insecure.NewCredentials()))
+	srv := grpc.NewServer(grpc.Creds(insecure.NewCredentials()), grpc.ChainUnaryInterceptor(interceptors.TracingUnaryInterceptor(logger)))
 
 	reflection.Register(srv)
 
