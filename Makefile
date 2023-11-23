@@ -17,9 +17,6 @@ generate-product-api:
 	--go-grpc_out=pkg/product_v1 --go-grpc_opt=paths=source_relative \
 	api/product_v1/product.proto
 
-migrate-product:
-	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product up
-
 test:
 	go test -count=100 ./...
 
@@ -28,7 +25,16 @@ cover:
 	go tool cover -html=coverage.out
 	rm coverage.out
 
-migrate:
+migrate-product:
 	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product force 1
 	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product down
 	migrate -database postgres://product:product@localhost:5432/product?sslmode=disable -path db/migrations/product up
+
+compose:
+	docker-compose up -d
+
+.PHONY: build
+
+build:
+	make compose
+	go run ./cmd/ProductServer/main.go
