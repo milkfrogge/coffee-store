@@ -22,12 +22,12 @@ type PostgresRepository struct {
 
 //TODO: add errors and their converters!!
 
-func (r *PostgresRepository) UpdateCountOfProduct(ctx context.Context, product model.Product) error {
+func (r *PostgresRepository) UpdateCountOfProduct(ctx context.Context, id string, count int) error {
 	//TODO implement me
 	panic("implement me")
 }
 
-func (r *PostgresRepository) UpdateManyCountsOfProduct(ctx context.Context, products []model.Product) error {
+func (r *PostgresRepository) UpdateManyCountsOfProduct(ctx context.Context, products map[string]int) error {
 	//TODO implement me
 	panic("implement me")
 }

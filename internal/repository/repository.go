@@ -18,8 +18,8 @@ type ProductRepository interface {
 
 	UpdateCategory(ctx context.Context, category model.Category) error
 	UpdateProduct(ctx context.Context, product model.Product) error
-	UpdateCountOfProduct(ctx context.Context, product model.Product) error
-	UpdateManyCountsOfProduct(ctx context.Context, products []model.Product) error
+	UpdateCountOfProduct(ctx context.Context, id string, count int) error
+	UpdateManyCountsOfProduct(ctx context.Context, products map[string]int) error
 
 	DeleteCategory(ctx context.Context, categoryId string) error
 	DeleteProduct(ctx context.Context, id string) error
