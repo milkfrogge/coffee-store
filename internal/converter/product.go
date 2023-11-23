@@ -64,3 +64,57 @@ func CreateProductToDTO(r *desc.CreateProductRequest) model.CreateProductDTO {
 	out.Description = r.Description
 	return out
 }
+
+func AddToProductToDTO(r *desc.AddCountToProductRequest) model.CountToProductDTO {
+	return model.CountToProductDTO{
+		Id:    r.Product.Id,
+		Count: r.Product.Count,
+	}
+}
+
+func SubtractProductToDTO(r *desc.SubtractCountToProductRequest) model.CountToProductDTO {
+	return model.CountToProductDTO{
+		Id:    r.Product.Id,
+		Count: r.Product.Count,
+	}
+}
+
+func SubtractManyProductsToDTO(r *desc.SubtractCountToManyProductsRequest) []model.CountToProductDTO {
+
+	out := make([]model.CountToProductDTO, len(r.Products))
+
+	for i := 0; i < len(r.Products); i++ {
+		out[i] = model.CountToProductDTO{
+			Id:    r.Products[i].Id,
+			Count: r.Products[i].Count,
+		}
+	}
+
+	return out
+
+}
+
+func ProtoToProduct(product *desc.Product) model.Product {
+	return model.Product{
+		Id:            product.Id,
+		Name:          product.Info.Name,
+		Description:   product.Info.Description,
+		Price:         product.Info.Price,
+		Count:         product.Info.Price,
+		BaristaNeeded: product.Info.BaristaNeeded,
+		KitchenNeeded: product.Info.KitchenNeeded,
+		Category: model.Category{
+			Id:   product.Info.Category.Id,
+			Name: product.Info.Category.Name,
+		},
+		Pics:      product.Info.Pics,
+		CreatedAt: product.CreatedAt.AsTime(),
+	}
+}
+
+func ProtoToCategory(category *desc.Category) model.Category {
+	return model.Category{
+		Id:   category.Id,
+		Name: category.Name,
+	}
+}

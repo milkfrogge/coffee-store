@@ -8,27 +8,31 @@ import (
 )
 
 const (
-	defaultHostEnvName       = "PRODUCT_SERVER_HOST"
-	defaultPortEnvName       = "PRODUCT_SERVER_PORT"
-	defaultDbHostEnvName     = "PRODUCT_DB_HOST"
-	defaultDbPortEnvName     = "PRODUCT_DB_PORT"
-	defaultDbUsernameEnvName = "PRODUCT_DB_USERNAME"
-	defaultDbPasswordEnvName = "PRODUCT_DB_PASSWORD"
-	defaultDbNameEnvName     = "PRODUCT_DB_NAME"
-	defaultJaegerHostEnvName = "JAEGER_HOST"
-	defaultJaegerPortEnvName = "JAEGER_PORT"
+	defaultHostEnvName        = "PRODUCT_SERVER_HOST"
+	defaultPortEnvName        = "PRODUCT_SERVER_PORT"
+	defaultDbHostEnvName      = "PRODUCT_DB_HOST"
+	defaultDbPortEnvName      = "PRODUCT_DB_PORT"
+	defaultDbUsernameEnvName  = "PRODUCT_DB_USERNAME"
+	defaultDbPasswordEnvName  = "PRODUCT_DB_PASSWORD"
+	defaultDbNameEnvName      = "PRODUCT_DB_NAME"
+	defaultJaegerHostEnvName  = "JAEGER_HOST"
+	defaultJaegerPortEnvName  = "JAEGER_PORT"
+	defaultGraylogHostEnvName = "GRAYLOG_HOST"
+	defaultGraylogPortEnvName = "GRAYLOG_PORT"
 )
 
 type ProductConfig struct {
-	host       string
-	port       string
-	dbHost     string
-	dbPort     string
-	JaegerHost string
-	JaegerPort string
-	dbUsername string
-	dbPassword string
-	dbName     string
+	host        string
+	port        string
+	dbHost      string
+	dbPort      string
+	JaegerHost  string
+	JaegerPort  string
+	GraylogHost string
+	GraylogPort string
+	dbUsername  string
+	dbPassword  string
+	dbName      string
 }
 
 func NewProductConfig() (*ProductConfig, error) {
@@ -77,16 +81,28 @@ func NewProductConfig() (*ProductConfig, error) {
 		return nil, errors.New("jaegerPort not found")
 	}
 
+	graylogHost := os.Getenv(defaultGraylogHostEnvName)
+	if len(graylogHost) == 0 {
+		return nil, errors.New("graylogHost not found")
+	}
+
+	graylogPort := os.Getenv(defaultGraylogPortEnvName)
+	if len(graylogPort) == 0 {
+		return nil, errors.New("graylogPort not found")
+	}
+
 	return &ProductConfig{
-		host:       host,
-		port:       port,
-		dbHost:     dbHost,
-		dbPort:     dbPort,
-		dbUsername: dbName,
-		dbPassword: dbPass,
-		dbName:     dbName,
-		JaegerHost: jaegerHost,
-		JaegerPort: jaegerPort,
+		host:        host,
+		port:        port,
+		dbHost:      dbHost,
+		dbPort:      dbPort,
+		dbUsername:  dbName,
+		dbPassword:  dbPass,
+		dbName:      dbName,
+		JaegerHost:  jaegerHost,
+		JaegerPort:  jaegerPort,
+		GraylogHost: graylogHost,
+		GraylogPort: graylogPort,
 	}, nil
 }
 

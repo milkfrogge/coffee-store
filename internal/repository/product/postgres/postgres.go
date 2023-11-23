@@ -1,4 +1,4 @@
-package product
+package postgres
 
 import (
 	"context"
@@ -6,6 +6,7 @@ import (
 	"github.com/gofrs/uuid/v5"
 	pgxuuid "github.com/jackc/pgx-gofrs-uuid"
 	"github.com/jackc/pgx/v5"
+	"github.com/jackc/pgx/v5/pgxpool"
 	"github.com/milkfrogge/coffee-store/internal/model"
 	"github.com/milkfrogge/coffee-store/internal/utils"
 	"go.opentelemetry.io/otel"
@@ -14,25 +15,61 @@ import (
 	"time"
 )
 
-type PostgresRepository struct {
-	conn   *pgx.Conn
+type Repository struct {
+	conn   *pgxpool.Pool
 	log    *slog.Logger
 	tracer trace.TracerProvider
 }
 
-//TODO: add errors and their converters!!
+func (r *Repository) UpdateCountOfProduct(ctx context.Context, id string, count uint64) error {
+	const op = "Product.Repo.Postgres.UpdateCountOfProduct"
+	r.log.Debug(op)
 
-func (r *PostgresRepository) UpdateCountOfProduct(ctx context.Context, id string, count int) error {
-	//TODO implement me
-	panic("implement me")
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	temp, _ := uuid.FromString(id)
+	productId := pgxuuid.UUID(temp)
+
+	_, err := r.conn.Exec(ctx, "UPDATE product SET counter = ($1) WHERE id=($2);", count, productId)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	return nil
+
 }
 
-func (r *PostgresRepository) UpdateManyCountsOfProduct(ctx context.Context, products map[string]int) error {
-	//TODO implement me
-	panic("implement me")
+func (r *Repository) UpdateManyCountsOfProduct(ctx context.Context, products map[string]uint64) error {
+	const op = "Product.Repo.Postgres.UpdateManyCountsOfProduct"
+	r.log.Debug(op)
+
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	defer func(tx pgx.Tx, ctx context.Context) {
+		_ = tx.Rollback(ctx)
+	}(tx, ctx)
+
+	for k, v := range products {
+		err := r.UpdateCountOfProduct(ctx, k, v)
+		if err != nil {
+			return fmt.Errorf("%s: %s", op, err.Error())
+		}
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	return nil
+
 }
 
-func (r *PostgresRepository) CreateCategory(ctx context.Context, category model.CreateCategoryDTO) (string, error) {
+func (r *Repository) CreateCategory(ctx context.Context, category model.CreateCategoryDTO) (string, error) {
 	const op = "Product.Repo.Postgres.CreateCategory"
 	r.log.Debug(op)
 
@@ -43,14 +80,14 @@ func (r *PostgresRepository) CreateCategory(ctx context.Context, category model.
 
 	err := r.conn.QueryRow(ctx, "INSERT INTO category (name) VALUES ($1) RETURNING id", category.Name).Scan(&id)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	b, _ := id.UUIDValue()
 	return fmt.Sprintf("%x", b.Bytes), nil
 }
 
-func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.CreateProductDTO) (string, error) {
+func (r *Repository) CreateProduct(ctx context.Context, product model.CreateProductDTO) (string, error) {
 	const op = "Product.Repo.Postgres.CreateProduct"
 	r.log.Debug(op)
 	var id pgxuuid.UUID
@@ -63,9 +100,14 @@ func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.Cr
 
 	tx, err := r.conn.Begin(ctx)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%s: %s", op, err.Error())
 	}
-	defer tx.Rollback(context.Background())
+	defer func(tx pgx.Tx, ctx context.Context) {
+		err := tx.Rollback(ctx)
+		if err != nil {
+			r.log.Error(err.Error())
+		}
+	}(tx, context.Background())
 
 	// insert product
 	err = tx.QueryRow(
@@ -80,7 +122,7 @@ func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.Cr
 		product.KitchenNeeded,
 	).Scan(&id)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	//insert pictures to this product
@@ -93,20 +135,20 @@ func (r *PostgresRepository) CreateProduct(ctx context.Context, product model.Cr
 		)
 
 		if err != nil {
-			return "", err
+			return "", fmt.Errorf("%s: %s", op, err.Error())
 		}
 	}
 
 	err = tx.Commit(ctx)
 	if err != nil {
-		return "", err
+		return "", fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	b, _ := id.UUIDValue()
 	return fmt.Sprintf("%x", b.Bytes), nil
 }
 
-func (r *PostgresRepository) FindAllCategories(ctx context.Context) ([]model.Category, error) {
+func (r *Repository) FindAllCategories(ctx context.Context) ([]model.Category, error) {
 	const op = "Product.Repo.Postgres.FindAllCategories"
 	r.log.Debug(op)
 
@@ -119,13 +161,13 @@ func (r *PostgresRepository) FindAllCategories(ctx context.Context) ([]model.Cat
 
 	rows, err := r.conn.Query(ctx, "SELECT name, id from category")
 	if err != nil {
-		return out, err
+		return out, fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	for rows.Next() {
 		err = rows.Scan(&category.Name, &id)
 		if err != nil {
-			return []model.Category{}, err
+			return []model.Category{}, fmt.Errorf("%s: %s", op, err.Error())
 		}
 
 		b, _ := id.UUIDValue()
@@ -137,7 +179,7 @@ func (r *PostgresRepository) FindAllCategories(ctx context.Context) ([]model.Cat
 	return out, nil
 }
 
-func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Product, error) {
+func (r *Repository) FindAllProducts(ctx context.Context) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindAllProducts"
 	r.log.Debug(op)
 
@@ -155,7 +197,7 @@ func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Produ
 		"SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id",
 	)
 	if err != nil {
-		return out, err
+		return out, fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	for rows.Next() {
@@ -172,7 +214,7 @@ func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Produ
 			&links,
 		)
 		if err != nil {
-			return []model.Product{}, err
+			return []model.Product{}, fmt.Errorf("%s: %s", op, err.Error())
 		}
 
 		b, _ := categoryId.UUIDValue()
@@ -188,7 +230,7 @@ func (r *PostgresRepository) FindAllProducts(ctx context.Context) ([]model.Produ
 	return out, nil
 }
 
-func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categoryIdS string) ([]model.Product, error) {
+func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS string) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindProductsByCategory"
 	r.log.Debug(op)
 
@@ -209,7 +251,7 @@ func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categor
 		"SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1", idUUID,
 	)
 	if err != nil {
-		return out, err
+		return out, fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	for rows.Next() {
@@ -226,7 +268,7 @@ func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categor
 			&links,
 		)
 		if err != nil {
-			return []model.Product{}, err
+			return []model.Product{}, fmt.Errorf("%s: %s", op, err.Error())
 		}
 
 		b, _ := categoryId.UUIDValue()
@@ -242,7 +284,7 @@ func (r *PostgresRepository) FindProductsByCategory(ctx context.Context, categor
 	return out, nil
 }
 
-func (r *PostgresRepository) FindOneProduct(ctx context.Context, idS string) (model.Product, error) {
+func (r *Repository) FindOneProduct(ctx context.Context, idS string) (model.Product, error) {
 	const op = "Product.Repo.Postgres.FindOneProduct"
 	r.log.Debug(op)
 
@@ -269,7 +311,7 @@ func (r *PostgresRepository) FindOneProduct(ctx context.Context, idS string) (mo
 		&product.Pics,
 	)
 	if err != nil {
-		return model.Product{}, err
+		return model.Product{}, fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	b, _ := categoryId.UUIDValue()
@@ -282,17 +324,100 @@ func (r *PostgresRepository) FindOneProduct(ctx context.Context, idS string) (mo
 	return product, nil
 }
 
-func (r *PostgresRepository) UpdateCategory(ctx context.Context, category model.Category) error {
-	//TODO implement me
-	panic("implement me")
+func (r *Repository) UpdateCategory(ctx context.Context, category model.Category) error {
+	const op = "Product.Repo.Postgres.UpdateCategory"
+	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	temp, _ := uuid.FromString(category.Id)
+	idUUID := pgxuuid.UUID(temp)
+
+	_, err := r.conn.Exec(ctx, "UPDATE category SET name=$1 where id=$2", category.Name, idUUID)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	return nil
 }
 
-func (r *PostgresRepository) UpdateProduct(ctx context.Context, product model.Product) error {
-	//TODO implement me
-	panic("implement me")
+func (r *Repository) UpdateProduct(ctx context.Context, product model.Product) error {
+	const op = "Product.Repo.Postgres.UpdateProduct"
+	r.log.Debug(op)
+
+	ctx, span := r.tracer.Tracer(op).Start(ctx, op)
+	defer span.End()
+
+	temp, _ := uuid.FromString(product.Id)
+	idUUID := pgxuuid.UUID(temp)
+
+	//create transaction
+	tx, err := r.conn.Begin(ctx)
+	if err != nil {
+		return err
+	}
+
+	defer func(tx pgx.Tx, ctx context.Context) {
+		_ = tx.Rollback(ctx)
+	}(tx, ctx)
+
+	//need to delete all pics associated with this id
+
+	_, err = tx.Exec(ctx, "DELETE FROM product_images where product_id=$1", idUUID)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	//insert pictures to this product
+	for i := 0; i < len(product.Pics); i++ {
+		_, err = tx.Exec(
+			ctx,
+			"INSERT INTO product_images (product_id, url) VALUES ($1,$2)",
+			idUUID,
+			product.Pics[i],
+		)
+
+		if err != nil {
+			return fmt.Errorf("%s: %s", op, err.Error())
+		}
+	}
+
+	_, err = tx.Exec(
+		ctx,
+		"UPDATE product SET "+
+			"name = $1,"+
+			"description = $2,"+
+			"price = $3,"+
+			"barista_needed = $4,"+
+			"kitchen_needed = $5,"+
+			"counter = $6,"+
+			"category = $7 "+
+			"where id=$8",
+		product.Name,
+		product.Description,
+		product.Price,
+		product.BaristaNeeded,
+		product.KitchenNeeded,
+		product.Count,
+		product.Category.Id,
+		idUUID,
+	)
+
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	err = tx.Commit(ctx)
+	if err != nil {
+		return fmt.Errorf("%s: %s", op, err.Error())
+	}
+
+	return nil
+
 }
 
-func (r *PostgresRepository) DeleteCategory(ctx context.Context, categoryIdS string) error {
+func (r *Repository) DeleteCategory(ctx context.Context, categoryIdS string) error {
 	const op = "Product.Repo.Postgres.DeleteCategory"
 	r.log.Debug(op)
 
@@ -305,14 +430,14 @@ func (r *PostgresRepository) DeleteCategory(ctx context.Context, categoryIdS str
 	_, err := r.conn.Exec(ctx, "Delete from category where id=$1", idUUID)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	return nil
 
 }
 
-func (r *PostgresRepository) DeleteProduct(ctx context.Context, idS string) error {
+func (r *Repository) DeleteProduct(ctx context.Context, idS string) error {
 	const op = "Product.Repo.Postgres.DeleteProduct"
 	r.log.Debug(op)
 
@@ -325,20 +450,20 @@ func (r *PostgresRepository) DeleteProduct(ctx context.Context, idS string) erro
 	_, err := r.conn.Exec(ctx, "Delete from product where id=$1", idUUID)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("%s: %s", op, err.Error())
 	}
 
 	return nil
 }
 
-func NewProductPostgresRepository(dsn string, log *slog.Logger) (*PostgresRepository, error) {
+func NewProductPostgresRepository(dsn string, log *slog.Logger) (*Repository, error) {
 
 	ctx := context.Background()
 
 	a, err := utils.WithAttempts(func() (any, error) {
 		ctxTimeout, cancel := context.WithTimeout(ctx, time.Second*5)
 		defer cancel()
-		conn, err := pgx.Connect(ctxTimeout, dsn)
+		conn, err := pgxpool.New(ctxTimeout, dsn)
 		if err != nil {
 			log.Error(fmt.Sprintf("Can`t establish connect to db: %s", err.Error()))
 			return nil, err
@@ -351,7 +476,7 @@ func NewProductPostgresRepository(dsn string, log *slog.Logger) (*PostgresReposi
 			return nil, err
 		}
 
-		return &PostgresRepository{
+		return &Repository{
 			conn:   conn,
 			log:    log,
 			tracer: tracerProvider,
@@ -362,6 +487,6 @@ func NewProductPostgresRepository(dsn string, log *slog.Logger) (*PostgresReposi
 		return nil, err
 	}
 
-	return a.(*PostgresRepository), nil
+	return a.(*Repository), nil
 
 }

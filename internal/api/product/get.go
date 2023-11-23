@@ -13,6 +13,7 @@ func (i *Implementation) GetSingleProduct(ctx context.Context, request *desc.Get
 
 	product, err := i.ProductService.GetSingleProduct(ctx, request.Id)
 	if err != nil {
+		i.log.Error(err.Error())
 		return nil, err
 	}
 

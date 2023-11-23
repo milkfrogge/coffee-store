@@ -12,6 +12,7 @@ func (i *Implementation) CreateProduct(ctx context.Context, request *desc.Create
 
 	id, err := i.ProductService.CreateProduct(ctx, converter.CreateProductToDTO(request))
 	if err != nil {
+		i.log.Error(err.Error())
 		return nil, err
 	}
 	return &desc.CreateProductResponse{Id: id}, nil
@@ -23,6 +24,7 @@ func (i *Implementation) CreateCategory(ctx context.Context, request *desc.Creat
 
 	id, err := i.ProductService.CreateCategory(ctx, converter.CreateCategoryToDTO(request))
 	if err != nil {
+		i.log.Error(err.Error())
 		return nil, err
 	}
 
