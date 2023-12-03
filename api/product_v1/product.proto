@@ -76,6 +76,7 @@ message GetAllProductsResponse {
 
 message GetAllProductsByCategoryRequest {
   string id = 1;
+  uint32 limit = 2;
 }
 
 message UpdateProductRequest {

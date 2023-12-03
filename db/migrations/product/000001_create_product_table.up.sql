@@ -33,6 +33,14 @@ INSERT INTO product (id, name, description, price, category, counter)
 VALUES ('00000000-0000-0000-0000-000000000001', 'Latte', 'Description of Latte', 240,
         '00000000-0000-0000-0000-000000000001', 500);
 
+INSERT INTO product (id, name, description, price, category, counter)
+VALUES ('00000000-0000-0000-0000-000000000002', 'Cappucino', 'Description of Latte', 240,
+        '00000000-0000-0000-0000-000000000001', 500);
+
+INSERT INTO product (id, name, description, price, category, counter)
+VALUES ('00000000-0000-0000-0000-000000000003', 'ZXC', 'Description of Latte', 240,
+        '00000000-0000-0000-0000-000000000001', 500);
+
 CREATE TABLE IF NOT EXISTS product_images
 (
     id         serial primary key,
