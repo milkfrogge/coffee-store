@@ -24,7 +24,7 @@ func (i *Implementation) GetAllProductsByCategory(ctx context.Context, request *
 	const op = "Implementation.GetAllProductsByCategory"
 	i.log.Debug(op)
 
-	products, err := i.ProductService.GetAllProductsByCategory(ctx, request.Id, request.Limit)
+	products, err := i.ProductService.GetAllProductsByCategory(ctx, request.Id, request.Limit, request.Offset)
 	if err != nil {
 		i.log.Error(err.Error())
 		return &desc.GetAllProductsResponse{}, nil

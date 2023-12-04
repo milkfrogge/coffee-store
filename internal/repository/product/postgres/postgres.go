@@ -230,7 +230,7 @@ func (r *Repository) FindAllProducts(ctx context.Context) ([]model.Product, erro
 	return out, nil
 }
 
-func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS string, limit uint32) ([]model.Product, error) {
+func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS string, limit, offset uint32) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindProductsByCategory"
 	r.log.Debug(op)
 
@@ -249,15 +249,24 @@ func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS str
 	q := ""
 
 	if limit == 0 {
-		q = "SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1"
+		q = "SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1  ORDER BY product.name OFFSET $2"
 	} else {
-		q = fmt.Sprintf("SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1 LIMIT %d", limit)
+		q = fmt.Sprintf("SELECT "+
+			"product.id, "+
+			"product.name, "+
+			"product.description, "+
+			"product.counter, "+
+			"product.price, "+
+			"product.created_at,  "+
+			"category.id, "+
+			"category.name, "+
+			"su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1 ORDER BY product.name LIMIT %d OFFSET $2", limit)
 	}
 
 	fmt.Println(q)
 
 	rows, err := r.conn.Query(
-		ctx, q, idUUID,
+		ctx, q, idUUID, offset,
 	)
 	if err != nil {
 		return out, fmt.Errorf("%s: %s", op, err.Error())

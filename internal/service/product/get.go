@@ -27,11 +27,11 @@ func (s *Service) GetAllProducts(ctx context.Context) ([]model.Product, error) {
 	return products, nil
 }
 
-func (s *Service) GetAllProductsByCategory(ctx context.Context, categoryId string, limit uint32) ([]model.Product, error) {
+func (s *Service) GetAllProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32) ([]model.Product, error) {
 	const op = "Product.Service.GetAllProductsByCategory"
 	s.log.Debug(op)
 
-	products, err := s.repo.FindProductsByCategory(ctx, categoryId, limit)
+	products, err := s.repo.FindProductsByCategory(ctx, categoryId, limit, offset)
 	if err != nil {
 		return nil, err
 	}

@@ -134,11 +134,11 @@ func TestService_GetAllProductsByCategory(t *testing.T) {
 		CreatedAt: time.Now(),
 	}}
 
-	m.EXPECT().FindProductsByCategory(ctx, catId, uint32(0)).Return(ret, nil).Times(1)
+	m.EXPECT().FindProductsByCategory(ctx, catId, uint32(0), uint32(0)).Return(ret, nil).Times(1)
 
 	uCase := NewService(m, log)
 
-	prod, err := uCase.GetAllProductsByCategory(ctx, catId, uint32(0))
+	prod, err := uCase.GetAllProductsByCategory(ctx, catId, uint32(0), uint32(0))
 
 	require.NoError(t, err)
 	require.ElementsMatch(t, ret, prod)
@@ -161,11 +161,11 @@ func TestService_GetAllProductsByCategoryError(t *testing.T) {
 	expErrors := []error{repo_product.ErrDbIsDown, repo_product.ErrNoSuchCategory}
 
 	for i := 0; i < len(catId); i++ {
-		m.EXPECT().FindProductsByCategory(ctx, catId[i], uint32(0)).Return(ret[i], expErrors[i]).Times(1)
+		m.EXPECT().FindProductsByCategory(ctx, catId[i], uint32(0), uint32(0)).Return(ret[i], expErrors[i]).Times(1)
 
 		uCase := NewService(m, log)
 
-		prod, err := uCase.GetAllProductsByCategory(ctx, catId[i], uint32(0))
+		prod, err := uCase.GetAllProductsByCategory(ctx, catId[i], uint32(0), uint32(0))
 
 		require.EqualError(t, err, expErrors[i].Error())
 		require.ElementsMatch(t, ret[i], prod)
