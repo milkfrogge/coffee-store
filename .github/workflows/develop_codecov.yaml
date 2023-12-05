@@ -8,7 +8,9 @@ jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@develop
+      - uses: actions/checkout@v4
+        with:
+          ref: develop
       - name: Upload coverage reports to Codecov
         uses: codecov/codecov-action@v3
         env:
