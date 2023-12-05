@@ -5,6 +5,12 @@ import (
 	"log/slog"
 )
 
+var sortingType = map[int32]string{
+	0: "name",
+	1: "price",
+	2: "created_at",
+}
+
 type Service struct {
 	repo repository.ProductRepository
 	log  *slog.Logger

@@ -2,6 +2,7 @@ package product
 
 import (
 	"context"
+	"fmt"
 	"github.com/milkfrogge/coffee-store/internal/model"
 )
 
@@ -27,11 +28,17 @@ func (s *Service) GetAllProducts(ctx context.Context) ([]model.Product, error) {
 	return products, nil
 }
 
-func (s *Service) GetAllProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32) ([]model.Product, error) {
+func (s *Service) GetAllProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32, sort int32) ([]model.Product, error) {
 	const op = "Product.Service.GetAllProductsByCategory"
 	s.log.Debug(op)
 
-	products, err := s.repo.FindProductsByCategory(ctx, categoryId, limit, offset)
+	if _, ok := sortingType[sort]; !ok {
+		sort = 0
+	}
+
+	fmt.Println(sortingType[sort])
+
+	products, err := s.repo.FindProductsByCategory(ctx, categoryId, limit, offset, sortingType[sort])
 	if err != nil {
 		return nil, err
 	}

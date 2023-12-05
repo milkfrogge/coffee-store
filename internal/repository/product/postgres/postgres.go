@@ -230,7 +230,7 @@ func (r *Repository) FindAllProducts(ctx context.Context) ([]model.Product, erro
 	return out, nil
 }
 
-func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS string, limit, offset uint32) ([]model.Product, error) {
+func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS string, limit, offset uint32, sort string) ([]model.Product, error) {
 	const op = "Product.Repo.Postgres.FindProductsByCategory"
 	r.log.Debug(op)
 
@@ -247,9 +247,19 @@ func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS str
 	idUUID := pgxuuid.UUID(temp)
 
 	q := ""
+	sort = fmt.Sprintf("product.%s", sort)
 
 	if limit == 0 {
-		q = "SELECT product.id, product.name, product.description, product.counter, product.price,product.created_at,  category.id, category.name, su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1  ORDER BY product.name OFFSET $2"
+		q = fmt.Sprintf("SELECT "+
+			"product.id, "+
+			"product.name, "+
+			"product.description, "+
+			"product.counter, "+
+			"product.price, "+
+			"product.created_at, "+
+			"category.id, "+
+			"category.name, "+
+			"su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1  ORDER BY %s", sort)
 	} else {
 		q = fmt.Sprintf("SELECT "+
 			"product.id, "+
@@ -260,13 +270,11 @@ func (r *Repository) FindProductsByCategory(ctx context.Context, categoryIdS str
 			"product.created_at,  "+
 			"category.id, "+
 			"category.name, "+
-			"su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1 ORDER BY product.name LIMIT %d OFFSET $2", limit)
+			"su.arr\nfrom product\n         join category on product.category = category.id\n         left join (select array_agg(url) as arr, product_images.product_id as id\n                    from product_images\n                             join product on product_images.product_id = product.id\n                    group by product_images.product_id) as su on product.id = su.id where product.category = $1 ORDER BY %s LIMIT %d OFFSET %d", sort, limit, offset)
 	}
 
-	fmt.Println(q)
-
 	rows, err := r.conn.Query(
-		ctx, q, idUUID, offset,
+		ctx, q, idUUID,
 	)
 	if err != nil {
 		return out, fmt.Errorf("%s: %s", op, err.Error())

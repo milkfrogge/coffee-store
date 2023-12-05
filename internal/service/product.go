@@ -11,7 +11,7 @@ type ProductService interface {
 
 	GetAllCategories(ctx context.Context) ([]model.Category, error)
 	GetAllProducts(ctx context.Context) ([]model.Product, error)
-	GetAllProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32) ([]model.Product, error)
+	GetAllProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32, sort int32) ([]model.Product, error)
 	GetSingleProduct(ctx context.Context, id string) (model.Product, error)
 
 	UpdateProduct(ctx context.Context, product model.Product) error

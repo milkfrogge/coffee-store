@@ -13,7 +13,7 @@ type ProductRepository interface {
 
 	FindAllCategories(ctx context.Context) ([]model.Category, error)
 	FindAllProducts(ctx context.Context) ([]model.Product, error)
-	FindProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32) ([]model.Product, error)
+	FindProductsByCategory(ctx context.Context, categoryId string, limit, offset uint32, sort string) ([]model.Product, error)
 	FindOneProduct(ctx context.Context, id string) (model.Product, error)
 
 	UpdateCategory(ctx context.Context, category model.Category) error

@@ -9,6 +9,12 @@ import "category.proto";
 
 option go_package = "github.com/milkfrogge/coffee-store/pkg/product_v1;product_v1";
 
+enum Sort {
+  Name = 0;
+  Price = 1;
+  Created_at = 2;
+}
+
 
 
 service ProductV1 {
@@ -78,6 +84,7 @@ message GetAllProductsByCategoryRequest {
   string id = 1;
   uint32 limit = 2;
   uint32 offset = 3;
+  Sort sort = 4;
 }
 
 message UpdateProductRequest {
