@@ -1,3 +1,5 @@
+[![codecov](https://codecov.io/gh/milkfrogge/coffee-store/branch/develop/graph/badge.svg?token=SL1VYEEBV4)](https://codecov.io/gh/milkfrogge/coffee-store)
+
 # Coffee Store
 
 This is my pet project, the goal of which is to develop a solution for a small coffee company.
