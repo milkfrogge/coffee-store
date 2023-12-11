@@ -6,6 +6,7 @@ import (
 	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
+// ProductsToProto converts slice of products to proto
 func ProductsToProto(products []model.Product) *desc.GetAllProductsResponse {
 	r := desc.GetAllProductsResponse{Product: make([]*desc.Product, 0)}
 	for _, product := range products {
@@ -14,6 +15,7 @@ func ProductsToProto(products []model.Product) *desc.GetAllProductsResponse {
 	return &r
 }
 
+// ProductToProto convert single product to proto
 func ProductToProto(product model.Product) *desc.Product {
 
 	return &desc.Product{
@@ -35,6 +37,7 @@ func ProductToProto(product model.Product) *desc.Product {
 	}
 }
 
+// CategoriesToProto  converts slice of categories to proto
 func CategoriesToProto(categories []model.Category) *desc.GetAllCategoriesResponse {
 	r := desc.GetAllCategoriesResponse{Category: make([]*desc.Category, 0)}
 	for _, category := range categories {
@@ -46,12 +49,14 @@ func CategoriesToProto(categories []model.Category) *desc.GetAllCategoriesRespon
 	return &r
 }
 
+// CreateCategoryToDTO convert request to category dto
 func CreateCategoryToDTO(r *desc.CreateCategoryRequest) model.CreateCategoryDTO {
 	out := model.CreateCategoryDTO{}
 	out.Name = r.Name
 	return out
 }
 
+// CreateProductToDTO convert request to product dto
 func CreateProductToDTO(r *desc.CreateProductRequest) model.CreateProductDTO {
 	out := model.CreateProductDTO{}
 	out.Name = r.Name
@@ -65,6 +70,7 @@ func CreateProductToDTO(r *desc.CreateProductRequest) model.CreateProductDTO {
 	return out
 }
 
+// AddToProductToDTO convert request to add count to product dto
 func AddToProductToDTO(r *desc.AddCountToProductRequest) model.CountToProductDTO {
 	return model.CountToProductDTO{
 		Id:    r.Product.Id,
@@ -72,6 +78,7 @@ func AddToProductToDTO(r *desc.AddCountToProductRequest) model.CountToProductDTO
 	}
 }
 
+// SubtractProductToDTO convert request to subtract count to product dto
 func SubtractProductToDTO(r *desc.SubtractCountToProductRequest) model.CountToProductDTO {
 	return model.CountToProductDTO{
 		Id:    r.Product.Id,
@@ -79,6 +86,7 @@ func SubtractProductToDTO(r *desc.SubtractCountToProductRequest) model.CountToPr
 	}
 }
 
+// SubtractManyProductsToDTO convert request to subtract many counts to product dto
 func SubtractManyProductsToDTO(r *desc.SubtractCountToManyProductsRequest) []model.CountToProductDTO {
 
 	out := make([]model.CountToProductDTO, len(r.Products))
@@ -94,6 +102,7 @@ func SubtractManyProductsToDTO(r *desc.SubtractCountToManyProductsRequest) []mod
 
 }
 
+// ProtoToProduct convert proto`s product to model.Product
 func ProtoToProduct(product *desc.Product) model.Product {
 	return model.Product{
 		Id:            product.Id,
@@ -112,6 +121,7 @@ func ProtoToProduct(product *desc.Product) model.Product {
 	}
 }
 
+// ProtoToCategory convert proto`s category to model.Category
 func ProtoToCategory(category *desc.Category) model.Category {
 	return model.Category{
 		Id:   category.Id,

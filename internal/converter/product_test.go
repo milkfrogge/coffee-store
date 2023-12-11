@@ -39,7 +39,7 @@ func TestCategoriesToProto(t *testing.T) {
 
 		proto := CategoriesToProto(table[i].Categories)
 
-		require.Equal(t, &desc.GetAllCategoriesResponse{Category: []*desc.Category{&desc.Category{
+		require.Equal(t, &desc.GetAllCategoriesResponse{Category: []*desc.Category{{
 			Id:   "0xdeadbeef",
 			Name: "1",
 		}}}, proto)
@@ -162,7 +162,7 @@ func TestProductsToProto(t *testing.T) {
 					CreatedAt: tExp,
 				},
 			},
-			Exp: desc.GetAllProductsResponse{Product: []*desc.Product{&desc.Product{
+			Exp: desc.GetAllProductsResponse{Product: []*desc.Product{{
 				Id: "0xdeadbee1",
 				Info: &desc.ProductInfo{
 					Name:          "1",
@@ -187,5 +187,118 @@ func TestProductsToProto(t *testing.T) {
 
 		require.Equal(t, &table[i].Exp, res)
 	}
+
+}
+
+func TestAddToProductToDTO(t *testing.T) {
+	r := &desc.AddCountToProductRequest{
+		Product: &desc.UpdateProductCountMessage{
+			Id:    "0xdeadbeef",
+			Count: 10,
+		},
+	}
+	dto := AddToProductToDTO(r)
+
+	require.Equal(t, model.CountToProductDTO{
+		Id:    "0xdeadbeef",
+		Count: 10,
+	}, dto)
+}
+
+func TestSubtractProductToDTO(t *testing.T) {
+	r := &desc.SubtractCountToProductRequest{
+		Product: &desc.UpdateProductCountMessage{
+			Id:    "0xdeadbeef",
+			Count: 10,
+		},
+	}
+	dto := SubtractProductToDTO(r)
+
+	require.Equal(t, model.CountToProductDTO{
+		Id:    "0xdeadbeef",
+		Count: 10,
+	}, dto)
+}
+
+func TestSubtractManyProductsToDTO(t *testing.T) {
+	r := &desc.SubtractCountToManyProductsRequest{
+		Products: []*desc.UpdateProductCountMessage{
+			{
+				Id:    "0xdeadbeef",
+				Count: 10,
+			},
+			{
+				Id:    "zxccxz",
+				Count: 100,
+			},
+		},
+	}
+	dto := SubtractManyProductsToDTO(r)
+
+	require.ElementsMatch(t, dto, []model.CountToProductDTO{
+		{
+			Id:    "0xdeadbeef",
+			Count: 10,
+		},
+		{
+			Id:    "zxccxz",
+			Count: 100,
+		},
+	})
+}
+
+func TestProtoToProduct(t *testing.T) {
+
+	tstamp := time.Now().UTC()
+
+	r := &desc.Product{
+		Id: "0xdeadbeef",
+		Info: &desc.ProductInfo{
+			Name:          "test",
+			Description:   "test",
+			Price:         10,
+			Count:         10,
+			BaristaNeeded: false,
+			KitchenNeeded: false,
+			Category: &desc.Category{
+				Id:   "0xdeadbeef",
+				Name: "test",
+			},
+			Pics: nil,
+		},
+		CreatedAt: timestamppb.New(tstamp),
+	}
+
+	dto := ProtoToProduct(r)
+
+	require.Equal(t, model.Product{
+		Id:            "0xdeadbeef",
+		Name:          "test",
+		Description:   "test",
+		Price:         10,
+		Count:         10,
+		BaristaNeeded: false,
+		KitchenNeeded: false,
+		Category: model.Category{
+			Id:   "0xdeadbeef",
+			Name: "test",
+		},
+		Pics:      nil,
+		CreatedAt: tstamp,
+	}, dto)
+
+}
+
+func TestProtoToCategory(t *testing.T) {
+	r := &desc.Category{
+		Id:   "0xdeadbeef",
+		Name: "test",
+	}
+	category := ProtoToCategory(r)
+
+	require.Equal(t, model.Category{
+		Id:   "0xdeadbeef",
+		Name: "test",
+	}, category)
 
 }

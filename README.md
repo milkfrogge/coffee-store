@@ -1,3 +1,4 @@
+![build](https://github.com/milkfrogge/coffee-store/actions/workflows/develop_codecov.yaml/badge.svg)
 [![codecov](https://codecov.io/gh/milkfrogge/coffee-store/branch/develop/graph/badge.svg?token=SL1VYEEBV4)](https://codecov.io/gh/milkfrogge/coffee-store)
 
 # Coffee Store
