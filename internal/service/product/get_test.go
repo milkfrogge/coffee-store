@@ -138,7 +138,7 @@ func TestService_GetAllProductsByCategory(t *testing.T) {
 
 	uCase := NewService(m, log)
 
-	prod, err := uCase.GetAllProductsByCategory(ctx, catId, uint32(0), uint32(0), 0)
+	prod, err := uCase.GetAllProductsByCategory(ctx, catId, uint32(0), uint32(0), 200)
 
 	require.NoError(t, err)
 	require.ElementsMatch(t, ret, prod)
