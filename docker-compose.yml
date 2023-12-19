@@ -29,6 +29,13 @@ services:
       - "--certificatesresolvers.myresolver.acme.tlschallenge=true"
       - "--certificatesresolvers.myresolver.acme.email=${ACME_EMAIL}"
       - "--certificatesresolvers.myresolver.acme.storage=/cert/acme.json"
+      # add metrics
+      - "--metrics.prometheus=true"
+      - "--metrics.prometheus.addEntryPointsLabels=true"
+      - "--metrics.prometheus.addrouterslabels=true"
+      - "--metrics.prometheus.addServicesLabels=true"
+      - "--entryPoints.metrics.address=:8100"
+      - "--metrics.prometheus.entryPoint=metrics"
 
     labels:
       - "traefik.enable=true"
@@ -54,7 +61,7 @@ services:
       - "traefik.http.routers.frontend.rule=Host(`portainer.${REMOTE_HOST}`)"
       - "traefik.http.routers.frontend.entrypoints=https"
       - "traefik.http.services.frontend.loadbalancer.server.port=8888"
-      - "traefik.http.routers.frontend.service=frontend"
+      - "traefik.http.routers.frontend.service=portainer"
       - "traefik.http.routers.frontend.tls.certresolver=myresolver"
 
   minio:
@@ -83,6 +90,40 @@ services:
       - "traefik.http.routers.minio.tls.certresolver=myresolver"
       - "traefik.http.routers.minio.service=minio"
       - "traefik.http.services.minio.loadbalancer.server.port=9000"
+
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./config/prometheus/:/etc/prometheus/
+      - prom_data:/prometheus
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+    ports:
+      - 9090:9090
+    restart: always
+
+  grafana:
+    image: grafana/grafana
+    container_name: grafana
+    ports:
+      - 3000:3000
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASS}
+    volumes:
+      - ./grafana:/etc/grafana/provisioning/datasources
+    labels:
+      - "traefik.enable=true"
+      # Console
+      - "traefik.http.routers.grafana.rule=Host(`metrics.${REMOTE_HOST}`)"
+      - "traefik.http.routers.grafana.entrypoints=https"
+      - "traefik.http.routers.grafana.tls.certresolver=myresolver"
+      - "traefik.http.routers.grafana.service=grafana"
+      - "traefik.http.services.grafana.loadbalancer.server.port=3000"
 
   rabbitmq:
     image: rabbitmq:3-management-alpine
@@ -172,3 +213,4 @@ services:
 volumes:
   pgdata:
   pgadmin-data:
+  prom_data:
