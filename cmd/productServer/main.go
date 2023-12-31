@@ -8,7 +8,6 @@ import (
 	productService "github.com/milkfrogge/coffee-store/internal/service/product"
 	"github.com/milkfrogge/coffee-store/pkg/interceptors"
 	"github.com/milkfrogge/coffee-store/pkg/jaeger"
-	loggerClient "github.com/milkfrogge/coffee-store/pkg/logger"
 	desc "github.com/milkfrogge/coffee-store/pkg/product_v1"
 	"go.opentelemetry.io/otel"
 	"google.golang.org/grpc"
@@ -41,14 +40,17 @@ func main() {
 	}
 
 	logger.Info("Init grayLogClient")
-	grayLogClient, err := loggerClient.NewGrayLogLogger(fmt.Sprintf("%s:%s", cfg.GraylogHost, cfg.GraylogPort))
-	if err != nil {
-		logger.Error(err.Error())
-		return
-	}
+	//grayLogClient, err := loggerClient.NewGrayLogLogger(fmt.Sprintf("%s:%s", cfg.GraylogHost, cfg.GraylogPort))
+	//if err != nil {
+	//	logger.Error(err.Error())
+	//	return
+	//}
 
 	logger.Info("Combine logger with graylog")
-	logger = slog.New(slog.NewJSONHandler(io.MultiWriter(os.Stdout, grayLogClient), &slog.HandlerOptions{
+	//logger = slog.New(slog.NewJSONHandler(io.MultiWriter(os.Stdout, grayLogClient), &slog.HandlerOptions{
+	//	Level: slog.LevelDebug,
+	//}))
+	logger = slog.New(slog.NewJSONHandler(io.MultiWriter(os.Stdout), &slog.HandlerOptions{
 		Level: slog.LevelDebug,
 	}))
 

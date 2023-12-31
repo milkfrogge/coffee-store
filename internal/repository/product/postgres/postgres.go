@@ -495,6 +495,15 @@ func NewProductPostgresRepository(dsn string, log *slog.Logger) (*Repository, er
 			return nil, err
 		}
 
+		ctx, cancel := context.WithTimeout(context.Background(), time.Second)
+		defer cancel()
+		err = conn.Ping(ctx)
+		if err != nil {
+			return nil, err
+		}
+
+		log.Info(fmt.Sprintf("Connection established with: %s", dsn))
+
 		tracerProvider := otel.GetTracerProvider()
 
 		if err != nil {

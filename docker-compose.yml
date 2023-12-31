@@ -78,7 +78,7 @@ services:
       - MINIO_BROWSER_REDIRECT_URL=https://console-storage.${REMOTE_HOST}
     labels:
       - "traefik.enable=true"
-       # Console
+      # Console
       - "traefik.http.routers.minio-console.rule=Host(`console-storage.${REMOTE_HOST}`)"
       - "traefik.http.routers.minio-console.entrypoints=https"
       - "traefik.http.routers.minio-console.tls.certresolver=myresolver"
@@ -130,6 +130,47 @@ services:
     ports:
       - "5672:5672"
       - "15672:15672"
+
+  product:
+    build:
+      dockerfile: ./deployments/product/Dockerfile
+      context: .
+
+    depends_on:
+      - product-pg
+      - jaeger
+      - graylog
+
+
+    ports:
+      - "5001:5001"
+
+  graylog:
+    image: graylog/graylog:5.0
+    environment:
+      # CHANGE ME (must be at least 16 characters)!
+      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
+      # Password: admin
+      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
+      - GRAYLOG_HTTP_EXTERNAL_URI=http://localhost:9000/
+    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
+    restart: always
+    depends_on:
+      - mongo
+      - elasticsearch
+    ports:
+      #      # Graylog web interface and REST API
+      - "9000:9000"
+      # Syslog TCP
+      - "1514:1514"
+      # Syslog UDP
+      - "1514:1514/udp"
+      # RAW TCP
+      - "5555:5555/tcp"
+      #      # GELF TCP
+      - "12201:12201"
+      #      # GELF UDP
+      - "12201:12201/udp"
 
   product-pg:
     image: postgres:13.3-alpine
@@ -183,32 +224,7 @@ services:
         limits:
           memory: 1g
 
-  graylog:
-    image: graylog/graylog:5.0
-    environment:
-      # CHANGE ME (must be at least 16 characters)!
-      - GRAYLOG_PASSWORD_SECRET=somepasswordpepper
-      # Password: admin
-      - GRAYLOG_ROOT_PASSWORD_SHA2=8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918
-      - GRAYLOG_HTTP_EXTERNAL_URI=http://127.0.0.1:9000/
-    entrypoint: /usr/bin/tini -- wait-for-it elasticsearch:9200 --  /docker-entrypoint.sh
-    restart: always
-    depends_on:
-      - mongo
-      - elasticsearch
-    ports:
-      # Graylog web interface and REST API
-      - 9000:9000
-      # Syslog TCP
-      - 1514:1514
-      # Syslog UDP
-      - "1514:1514/udp"
-      # RAW TCP
-      - "5555:5555/tcp"
-      # GELF TCP
-      - 12201:12201
-      # GELF UDP
-      - 12201:12201/udp
+
 
 volumes:
   pgdata:
